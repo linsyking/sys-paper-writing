@@ -1,4 +1,4 @@
 interface:
-  display_name: "Research Paper Writing"
-  short_description: "Academic paper writing and section-level refinement"
-  default_prompt: "Use $research-paper-writing to improve my paper's structure, flow, and section writing quality."
+  display_name: "Systems Paper Writing (OSDI/SOSP)"
+  short_description: "OSDI/SOSP writing, design, and evaluation for ML systems"
+  default_prompt: "Use $research-paper-writing to improve my OSDI/SOSP paper's systems story, design explanation, and claim-evidence alignment."

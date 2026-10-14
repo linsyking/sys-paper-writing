@@ -1,102 +1,57 @@
-# Experiments Writing Guide
+# Systems Evaluation / Experiments
 
-## Goal
+## Begin with questions, not a benchmark list
 
-Convince reviewers with complete evidence on effectiveness, causality, and practical value.
+Map each major claim to the evidence needed to establish it. Choose only experiments relevant to those claims; no fixed number of baselines, datasets, or ablations establishes completeness.
 
-## Three Core Questions
+| Claim | Question | Evidence and control |
+| --- | --- | --- |
+| End-to-end benefit | Does the complete system improve the intended objective? | Relevant baseline, same semantics and workload, explicit resource budget |
+| Mechanism explains gain | Which decision removes the bottleneck? | Valid remove/replace variant, simple alternative, breakdown, or controlled perturbation |
+| Scalability | How does behavior change with scale? | Resource/load sweep, normalized efficiency, saturation point |
+| Adaptation | How does it respond to changing conditions? | Time series, transition overhead, bursts/preemption/skew |
+| Low overhead | What does the system add when benefit is small? | CPU/GPU/memory/network costs and unfavorable regimes |
+| Reliability/correctness | What properties and failures are covered? | Stated model, proof/analysis where needed, fault/bug cases, misses and false alarms |
+| Practical value | Does the design fit its intended environment? | Integration evidence, operational observations, limits, reproducibility |
 
-1. Is the method better than strong baselines?
-   - Run comparison experiments against strong and recent baselines.
-   - Report standard metrics on the main benchmark(s).
-   - Include SOTA or strongest public methods, not only weak baselines.
-   - Keep protocol fair (same data split, preprocessing, and evaluation settings).
-2. Which modules/design choices make the gain?
-   - Run ablation studies for each key module/design choice.
-   - Use remove/replace/disable variants and report delta to full model.
-   - Include component interaction ablations when modules are coupled.
-3. How far can the method generalize under harder settings?
-   - Run demos/evaluations on harder or out-of-distribution settings.
-   - Add stress-test scenarios (more complex scenes, rarer cases, noisier inputs, or stricter constraints).
-   - Report both gains and failure modes to show realistic boundaries.
+See [mlsys.md](mlsys.md) for serving, training, compiler, and reliability-specific controls.
 
-## Experiment Planning
+## State the protocol before results
 
-```mermaid
-flowchart TB
-    A["Key Paper Claims"] --> B["What Contributions Are Claimed?"]
-    B --> C1["Contribution 1"]
-    B --> C2["Contribution 2"]
-    B --> C3["Contribution 3"]
-    C1 --> D1["Validation Experiment 1"]
-    C2 --> D2["Validation Experiment 2"]
-    C3 --> D3["Validation Experiment 3"]
+Describe hardware/topology; software/baseline versions; workload construction; parameter choices; resource budgets; metrics; warm-up and measurement windows; and repetition/uncertainty appropriate to the experiment. Report whether requests are open-loop arrivals or closed-loop clients. Closed-loop load reduces submissions during stalls and can mask queueing tails; explain why the model fits the target service.
 
-    E["Method Pipeline Figure"] --> F["What Modules and Parameters Matter?"]
-    F --> G1["Technical Module 1"]
-    F --> G2["Technical Module 2"]
-    F --> G3["Key Parameter 1"]
-    F --> G4["Key Parameter 2"]
-    G1 --> H1["Ablation Study 1"]
-    G2 --> H2["Ablation Study 2"]
-    G3 --> H3["Ablation Study 3"]
-    G4 --> H4["Ablation Study 4"]
-```
+For traces, give provenance, sampling, anonymization or transformations, and what was retained. Separate measured executions, simulations, extrapolations, and production observations. Validate a simulator before relying on its large-scale predictions.
 
-## Experiment Section Decomposition
+## Fair comparisons
 
-```mermaid
-flowchart TB
-    S1["Experimental Setup"] --> S2["Validation Experiment 1"]
-    S2 --> S3["Validation Experiment 2"]
-    S3 --> S4["Ablation Studies"]
-```
+Use the strongest relevant public systems and a practical simple alternative. Cite versions and explain tuning effort and important feature differences. A historical baseline in an example is not necessarily a current competitor.
 
-## Figure/Table Writing Rules
+Align hardware type/count, memory/network budget, input mix, output length, precision/quality, consistency, and correctness assumptions where the question requires equivalence. If a design intentionally uses a different resource mix, compare cost/performance or a justified budget and disclose the difference. Do not quietly substitute an impoverished baseline or omit failed/OOM configurations.
 
-`Good tables are part of experiment communication quality, not decoration.`
+## Define metrics precisely
 
-1. Figure captions and table captions are equally important in the writing quality of Experiments.
+- Throughput: completed work per unit time; distinguish requests, tokens, samples, and iterations.
+- Latency: endpoint timestamps, included queueing, percentile, and population. A ratio of latencies is not a percentage reduction.
+- Goodput: specify the useful-completion predicate, measurement window, admission/drop policy, and normalization. Distinguish compliant completions per second from maximum sustainable arrival rate at a target SLO attainment; different papers use different definitions.
+- SLO attainment: define numerator/denominator and whether every required latency constraint must pass for one request. Include rejected, timed-out, and unfinished requests appropriately so admission cannot inflate service quality.
+- Cost/efficiency: define denominator, hardware/time/pricing assumptions, and communication or idle-resource costs. GPU utilization alone does not establish cost savings.
 
-### Hard rules
+Avoid averaging percentiles across runs or hiding tails in mean latency. Explain how repeated runs or samples are combined. Identify maximum, median, arithmetic mean, and geometric mean correctly; do not turn an “up to” gain into an average.
 
-1. Put caption above the table.
-2. Avoid vertical lines (`|`) in tabular columns.
-3. Do not use double rules or dense `\hline` stacks.
-4. Use `booktabs` style (`\toprule`, `\midrule`, `\bottomrule`) for clean structure.
-5. Use as few horizontal rules as possible; lines should separate groups, not every row.
-6. Highlight key numbers (best/second-best or target rows) with subtle color emphasis.
+## Write each result as an argument
 
-### Readability rules from review practice
+State the question → describe the comparison → report the scoped observation → explain the mechanism → acknowledge a boundary. A curve is not self-explanatory. Include neutral or negative results when they change the design's applicability.
 
-1. Label metric direction in column headers (for example `PSNR ↑`, `LPIPS ↓`).
-2. Add units when needed so values are interpretable without guessing.
-3. Align text columns left; keep numeric columns consistently aligned.
-4. Keep numeric precision consistent (same decimal places within a metric column).
-5. Group multi-dataset or multi-setting results using `\multicolumn` + `\cmidrule`, not vertical separators.
-6. One table, one message: do not mix unrelated results in a single table.
-7. If rows represent different attributes/ablations, encode that explicitly in row names or attribute columns.
-8. Keep caption focused on setting/protocol/notation, not long discussion.
-9. If there is little detail to explain, use one concise sentence to summarize the main result.
-10. For single-column figures/tables in two-column papers, prefer placing them in the right column when layout allows, so readers can enter the page from the left-top text without breaking reading flow.
+Ablations should preserve a valid system. If disabling a component changes semantics or makes execution impossible, use a meaningful alternative or another form of evidence and explain the choice. Measure component interactions when the claim depends on them. Pair microbenchmarks with application results before asserting end-to-end benefit.
 
-### Minimal LaTeX checklist
+## Figures and tables
 
-1. Add packages in preamble: `\usepackage{booktabs}`, `\usepackage{colortbl,xcolor}` (and optionally `\usepackage{siunitx}` for decimal alignment).
-2. Replace `\hline`-heavy style with `\toprule/\midrule/\bottomrule`.
-3. Put `\caption{...}` before `\label{...}` and keep caption above.
-4. Use restrained highlighting; never color too many cells.
+Give axes units, workload/model, resource count, baseline identity, metric direction, and uncertainty when relevant. Show load/latency or SLO curves when a single operating point conceals a tradeoff. Label simulated results and distinguish offered load from achieved throughput. Captions should identify the setting and the takeaway without claiming more than the figure shows.
 
-## Recommended Ablation Package
+Prefer readable typography, consistent precision, sparse table rules, and encodings that remain distinguishable in grayscale. Follow the actual venue/template's caption and layout conventions; a right-column placement or decorative teaser is not a universal rule. Do not manipulate axes or aggregate away regressions.
 
-1. One core ablation table for all major contributions.
-2. Several focused mini-ablations for module-level design choices.
-3. Matching qualitative visual results for each important ablation.
+## Prioritize missing evidence
 
-## Experimental Rigor Checklist
+Label each gap as essential to the central claim, helpful for mechanism understanding, or optional breadth. Recommend the smallest experiment/analysis that resolves a consequential uncertainty. If it cannot be run, narrow the claim rather than writing the result as though it exists.
 
-1. Are baselines recent and relevant?
-2. Are metrics sufficient and standard for this task?
-3. Is ablation tied to every key design claim?
-4. Are claims in Abstract/Introduction supported by reported numbers?
-5. Are limitations of evaluation scope explicitly stated?
+Examples: [DistServe](examples/distserve.md) for SLO-aware objectives, [FuseLink](examples/fuselink.md) for microbenchmarks plus applications, [TrainCheck](examples/traincheck.md) for detection quality, [Sailor](examples/sailor.md) for simulator validation, and [Mercury](examples/mercury.md) for scoped compiler evaluation.

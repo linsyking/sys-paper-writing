@@ -1,196 +1,42 @@
-# Method Writing Guide
+# System Design / Method
 
-## Goal
+## Begin with the contract
 
-Write the Method section clearly by following this sequence:
+State the system's inputs, externally visible behavior, objective, and assumptions. List relevant limits: workload knowledge, hardware features, consistency, failure model, or numerical semantics. Explain what the design guarantees and what it merely optimizes empirically.
 
-1. Answer key method-design questions.
-2. Draw a pipeline figure sketch.
-3. Write the method section step by step.
+## Overview before mechanisms
 
-## Pre-Writing Questions
+Use an architecture diagram and a representative request, iteration, or operation. Identify components, interfaces, state ownership, and the flow of data and decisions. Distinguish control-plane decisions from work on the critical path. Where useful, show placement across process, host, GPU, or trust boundaries.
 
-`Before writing Method, first answer: (1) what modules exist in the method, and (2) for each module, what is the workflow, why this module is needed, and why this module works.`
+A common arrangement is goals/assumptions → overview → mechanisms → correctness/failure handling → implementation. Combine or reorder these when the reader's dependencies require it.
 
-Recommended organization:
+## Explain each consequential design choice
 
-1. List all modules in the pipeline.
-2. For each module, answer three questions:
+| Question | Content to supply |
+| --- | --- |
+| Why is it needed? | Bottleneck, conflicting goals, or semantic obligation |
+| How does it work? | Inputs, state, decision rule, ordered actions, outputs |
+| Why this choice? | Reasoning and comparison with a plausible alternative |
+| What must remain true? | Invariant, ordering rule, resource bound, or numerical constraint |
+| What does it cost? | Communication, memory, metadata, synchronization, tuning, or complexity |
+| Where does it stop helping? | Workload, hardware, or failure boundary |
 
-- How does the module run?
-- Why do we need this module?
-- Why does this module work?
+Do not mechanically repeat this table for every trivial helper. Use it to find missing explanations in important mechanisms.
 
-3. Organize answers as a mind map or a table for clarity.
+## Make the execution inspectable
 
-## Method Writing Steps
+For scheduling, specify what is measured or predicted, the decision interval, the objective, admission and queue behavior, tie-breaking/fairness when relevant, and how decisions are enforced. For caching, specify keys, ownership, sharing, invalidation, eviction, and transfer completion. For compilers, specify the abstraction, legal transformations, dependence constraints, lowering, and search space.
 
-`Method writing steps: (1) draw pipeline figure sketch, (2) map subsections from the sketch, (3) plan each subsection with motivation/design/advantages, (4) write module design first, (5) then add motivation and technical advantages.`
+Use pseudocode when it clarifies a decision rule. Define symbols and units before an equation. An optimization objective needs constraints and a description of how its solution affects execution.
 
-Step-by-step workflow:
+## Correctness and failure behavior
 
-1. Draw the pipeline figure sketch.
-2. Use the sketch to organize Method subsection structure.
-3. For each subsection, plan three parts: motivation, module design, and technical advantages.
-4. Write module design first to build a concrete backbone.
-5. Add motivation and technical advantages afterward.
+Choose obligations appropriate to the paper. Explain concurrency and state transitions that can violate the contract: migration while a request runs, stale metadata, retries after partial completion, or reconfiguration during a training iteration. State failure assumptions and recovery behavior if resilience is claimed. If the system requires reliable nodes, say so rather than inventing recovery support.
 
-## Three Elements of a Pipeline Module
+A proof should connect its abstract model to the implemented mechanism. Empirical tests can expose bugs and validate particular cases; they do not prove a universal safety guarantee. Learned invariants or heuristics require stated applicability conditions.
 
-`A pipeline module has three elements: Module design, Motivation of this module, and Technical advantages of this module.`
+## Tradeoffs belong in the design
 
-### 1) Module Design
+Disaggregation may add communication. Overlap may add buffering or interfere with foreground work. Aggressive batching may harm latency. Faster training may change numerical behavior. Explain why the chosen compromise fits the intended setting, then direct readers to the evaluation that measures it.
 
-Definition:
-
-1. Describe representation/network/data-structure details.
-2. Describe the forward process clearly: given input -> step 1 -> step 2 -> step 3 -> output.
-
-### 2) Motivation of This Module
-
-Definition:
-
-1. Explain why this module is needed.
-2. Use problem-driven logic: because problem X exists, we design module Y.
-
-### 3) Technical Advantages of This Module
-
-Definition:
-
-1. Explain why this module has technical advantage over alternatives.
-2. Tie advantage to measurable behavior when possible.
-
-### Example of the Three Elements
-
-Local cite:
-
-1. `references/examples/method/example-of-the-three-elements.md`
-
-## Method Content Decomposition
-
-```mermaid
-flowchart LR
-    A["Draw the technical pipeline figure"] --> B["Decompose Method content"]
-    B --> C1["Subsection 1 (Technical Module 1)"]
-    B --> C2["Subsection 2 (Technical Module 2)"]
-    B --> C3["Subsection 3 (Technical Module 3)"]
-    C1 --> D1["Motivation"]
-    C1 --> D2["Detailed design"]
-    C1 --> D3["Technical advantage"]
-```
-
-## How to Write Module Design
-
-`Module design usually has two parts: (1) describe specific data/network structures, and (2) describe forward process as input -> steps -> output.`
-
-Writing structure:
-
-1. Define key structures first (representation, network, data structure).
-2. Write forward process in strict execution order.
-3. End with output interpretation or purpose.
-
-Sentence skeleton:
-
-1. `We represent ... with ...`
-2. `Given [input], we first ... then ... finally ...`
-3. `This produces [output], which is used for ...`
-
-Local cite:
-
-1. `references/examples/method/module-design-instant-ngp.md`
-
-## How to Write Module Motivation
-
-`Module motivation is usually problem-driven: because a problem exists, we design xx to solve it.`
-
-Typical opening sentences:
-
-1. `A remaining problem/challenge is ...`
-2. `However, we ...`
-3. `Previous methods have difficulty in ...`
-
-Local cite:
-
-1. `references/examples/method/module-motivation-patterns.md`
-
-## How to Check Whether Method is Easy to Understand
-
-`Check method clarity from three levels: writing logic, paragraph writing, and sentence writing.`
-
-### 1) Logic-level check
-
-1. After finishing the paper, summarize the Method writing logic again.
-2. Check whether this summarized logic is smooth and easy to follow.
-
-### 2) Paragraph-level check
-
-1. The first sentence of each paragraph should make readers immediately understand what this paragraph is about.
-2. One paragraph should clearly deliver one message.
-
-### 3) Sentence-level check
-
-1. Carefully check whether the **motivation** of each sentence is explicit. Keep one thing clear to readers at all times: **why this sentence content is needed**.
-2. Carefully check sentence-to-sentence flow.
-3. Carefully check term consistency and avoid changing key terms back and forth.
-
-## Method Section Skeleton
-
-```latex
-\section{Method}
-% Overview
-% Section 3.1
-% Section 3.2
-% Section 3.3
-```
-
-Local cite:
-
-1. `references/examples/method/section-skeleton.md`
-
-## Overview Subsection
-
-`Overview should usually include: setting, core contribution, optional pipeline figure pointer, and a map of what each subsection contains.`
-
-Writing structure:
-
-1. One to two sentences for task setting.
-2. One to two sentences for core contribution.
-3. If pipeline/framework is novel, point to overview figure.
-4. Tell readers what Section 3.1/3.2/3.3 covers.
-
-Local cite:
-
-1. `references/examples/method/overview-template.md`
-
-## Section 3.1 and Other Module Subsections
-
-`Basic subsection logic: (1) motivation of this module, (2) module forward process/module design, (3) technical advantages of this module.`
-
-Local cite:
-
-1. `references/examples/method/example-of-the-three-elements.md`
-
-## Module Writing Pattern (Mermaid)
-
-```mermaid
-flowchart TB
-    M1["State module motivation (challenge)"] --> M2["Define module design (representation/network)"]
-    M2 --> M3["Describe forward process (input -> steps -> output)"]
-    M3 --> M4["Explain technical advantages and verifiable gains"]
-```
-
-## Implementation Details
-
-`Implementation details include hyperparameters (e.g., layer count, feature dimensions), coordinate transforms/normalization, and other practical details. Put them near the end of Method or in a dedicated Implementation Details section.`
-
-## Example Bank
-
-1. `references/examples/method-examples.md`
-2. `references/examples/method/pre-writing-questions.md`
-3. `references/examples/method/module-triad-neural-body.md`
-4. `references/examples/method/module-design-instant-ngp.md`
-5. `references/examples/method/module-motivation-patterns.md`
-6. `references/examples/method/section-skeleton.md`
-7. `references/examples/method/overview-template.md`
-8. `references/examples/method/example-of-the-three-elements.md`
-9. `references/examples/method/method-writing-common-issues-note.md`
+See [DistServe](examples/distserve.md) for decoupling with placement costs, [Mercury](examples/mercury.md) for an abstraction exposing a design space, and [TrainCheck](examples/traincheck.md) for preconditions on inferred checks.

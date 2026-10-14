@@ -1,86 +1,40 @@
-# Paper Review (Paper Rview)
+# Reviewer-Style Systems Paper Review
 
-## Goal
+## Review the actual paper type and requested scope
 
-Use an adversarial, reviewer-style checklist to detect reject risks early and revise the paper before submission.
+Identify the thesis and central claims first. Assess whether the evidence supports them. A design paper, measurement paper, verification paper, and operational-experience paper need different kinds of evidence; do not require a universal benchmark checklist. Use [paper-story.md](paper-story.md) when framing is unresolved.
 
-## Core Principle
+## Five review dimensions
 
-Pursue perfectionism in paper quality: assume reviewers will probe every weak point and proactively fix them.
+| Dimension | Questions that can change the assessment |
+| --- | --- |
+| Significance and insight | Is this an important systems problem? What changes readers' understanding or practice? Is the contribution distinct from the nearest prior design and simple alternative? |
+| Design and correctness | Are assumptions, interfaces, state, and critical execution clear? Do the mechanisms deliver the claimed contract? Are relevant concurrency, numerical, and failure conditions addressed? |
+| Evaluation credibility | Are metrics and resource/semantic budgets clear? Are comparisons fair and current enough for the claim? Does evidence explain gains, costs, regressions, and relevant scale? |
+| Practicality and reproducibility | Was the system implemented, simulated, or deployed as stated? Are integration constraints and needed configuration/data documented? Can central results be assessed from the main paper? |
+| Clarity and scope | Can a broad systems reader follow the argument? Do figures and terms agree? Are prominent claims limited to the workload, hardware, quality, and fault conditions actually established? |
 
-## Critical Rule (Do Not Violate)
+## Common consequential objections
 
-Every major claim, especially in Abstract and Introduction, must be:
+- The motivation shows a symptom but never isolates the proposed cause.
+- The main gain could be explained by more GPUs, weaker semantics, a smaller output, lower model quality, or different tuning.
+- A scheduler's throughput gain masks unacceptable tail latency, drops, or starvation.
+- A local bandwidth/kernel result is presented as an application-level speedup.
+- A planner is evaluated only with its own unvalidated simulator.
+- A detector sees only faulty runs, so false alarms remain unknown.
+- Reliability/correctness language exceeds the stated model or evidence.
+- The system's overhead, strongest simple alternative, or unfavorable operating regime is omitted.
+- Production context is claimed from a trace replay or a prototype.
+- The novelty depends on hiding reused techniques or closely related prior work.
 
-1. technically correct, and
-2. explicitly supported by experimental evidence.
+Apply an objection only when it fits the paper's claims; do not manufacture new scope requirements.
 
-If a claim is not supported, either add evidence or weaken/remove the claim.
+## Report actionable findings
 
-## What Usually Gets a Paper Accepted
+| Priority | Claim / locator | Objection and consequence | Existing evidence | Resolution |
+| --- | --- | --- | --- | --- |
+| Central / significant / minor | Exact claim and section | Why it affects the thesis or interpretation | Supported, partial, absent | Rewrite, narrow scope, supply analysis, or run a named experiment |
 
-1. Sufficient contribution (for example: novel task, novel pipeline, novel module, novel design choices, new experimental findings, or new insight).
-2. Better empirical performance than prior methods under fair comparisons.
-3. Sufficient comparison experiments and ablation studies.
+Separate missing explanation from missing evidence. Give the smallest useful follow-up and its expected decision value, not an indiscriminate wish list. If no experiment can be added, propose honest claim wording that fits the existing evidence.
 
-## Common Rejection Dimensions
-
-| Rejection Dimension          | Typical Failure Signals                                                                                                                                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1. Insufficient contribution | 1.1 Targeted failure cases are too common.<br /> 1.2 Proposed technique is already well explored; expected gains are predictable/well-known.                                                                                                                                               |
-| 2. Unclear writing           | 2.1 Missing technical details; work is not reproducible.<br />2.2 A method module lacks clear motivation.                                                                                                                                                                                  |
-| 3. Weak empirical effect     | 3.1 Improvement over prior methods is only marginal.<br /> 3.2 Even if better than previous methods, absolute performance is still not strong enough.                                                                                                                                      |
-| 4. Incomplete evaluation     | 4.1 Missing ablation studies.<br />4.2 Missing important baselines or important evaluation metrics.<br /> 4.3 Datasets are too simple to prove the method truly works.                                                                                                                    |
-| 5. Problematic method design | 5.1 Experimental setting is unrealistic.<br />5.2 Method has technical flaws and appears unreasonable.<br />5.3 Method is not robust and needs per-scenario hyperparameter tuning. <br /> 5.4 New design introduces stronger limitations than its benefits, leading to negative net value. |
-
-## End-of-Paper Self-Review Question List
-
-Add this checklist near the end of the draft while revising.
-Use each question to trigger concrete edits before submission.
-
-### 1. Contribution
-
-1. What new knowledge does this paper give to readers?
-2. Are we solving a truly meaningful failure case, not a trivial/common one?
-3. Is the technical idea genuinely non-obvious beyond well-explored practice?
-4. Is our gain surprising or insightful rather than a predictable improvement?
-5. Is there at least one clear novelty type (task/pipeline/module/design finding/insight)?
-
-### 2. Writing Clarity
-
-1. Can a knowledgeable reader reproduce the method from the paper?
-2. Did we provide enough technical detail for each key module?
-3. Is the motivation of every module explicit and logically connected to a challenge?
-4. Are terms and notation consistent across sections?
-5. Does each paragraph carry one clear message with smooth transitions?
-
-### 3. Experimental Strength
-
-1. Are improvements over strong baselines meaningful, not just statistically tiny?
-2. Is absolute performance competitive enough for the target venue?
-3. Are gains consistent across multiple datasets/settings/metrics?
-4. Do we report both strengths and failure cases honestly?
-
-### 4. Evaluation Completeness
-
-1. Do we include ablations for all key design choices?
-2. Are all strong/recent baselines included under fair settings?
-3. Are evaluation metrics standard and sufficient for this task?
-4. Are datasets/scenarios challenging enough to validate real effectiveness?
-5. Are comparison and ablation protocols clearly documented?
-
-### 5. Method Design Soundness
-
-1. Is the experimental setting realistic for practical use?
-2. Does the method have hidden technical defects or unreasonable assumptions?
-3. Is the method robust without heavy per-case hyperparameter retuning?
-4. Do benefits outweigh added complexity and new limitations?
-5. Could reviewers reasonably argue that the net benefit is negative?
-
-## Adversarial Writing Workflow
-
-1. Read the paper as a skeptical reviewer.
-2. Answer every question above with explicit evidence from the paper.
-3. Mark each item as `pass`, `needs revision`, or `needs new experiment`.
-4. Revise claims, writing, experiments, or method scope accordingly.
-5. Repeat until no major rejection risk remains.
+For a full-paper review, include a short assessment of the paper's contribution, strongest evidence, main risks, and prioritized revisions. Track resolved and unresolved objections without promising acceptance. For a local edit, report only issues material to that edit.

@@ -1,41 +1,21 @@
-# Related Work Writing Guide
+# Related Work in a Systems Paper
 
-## Goal
+## Position the contribution by mechanism
 
-Position your work against the most relevant lines of research, and make your novelty easy to verify.
+Organize around the nearest design decisions or assumptions: scheduling versus disaggregation, memory placement versus caching, explicit communication versus collective APIs, or testing versus invariant checking. Use publication chronology only when it explains a changed assumption.
 
-## Workflow
+For each cluster, describe the common approach, its intended setting, and the specific relation to this paper. A difference is not automatically a deficiency. Do not dismiss a system for an objective or workload it did not target.
 
-1. List directly competing and recent baseline papers first.
-2. Group literature by technical topic (not by publication year alone).
-3. For each topic: summarize common paradigm, then key limitation relevant to your challenge.
-4. End each topic by clarifying your distinction.
+## Comparison matrix
 
-## Topic Design
+| Prior system | Objective and scope | Assumptions / mechanism | Relationship to this work | Evaluation comparison |
+| --- | --- | --- | --- | --- |
+| Verified citation and version | What it optimizes or guarantees | Hardware, workload, semantics | Borrowed idea, changed interface, or distinct tradeoff | Included, inapplicable with reason, or missing |
 
-Use 2-4 focused topics, for example:
+Check the closest predecessor, strongest current competitor, and simplest credible approach. A reused mechanism should be credited where it enters Design, not only in Related Work. Feature tables complement explanation; unsupported checkmarks do not establish novelty.
 
-1. Task-specific mainstream methods.
-2. Methods closest to your core idea.
-3. Auxiliary techniques your method builds on.
+## Paragraph pattern
 
-## Paragraph Template
+> [Research line] addresses [objective] through [mechanism]. [Representative works] assume or target [setting]. Our work shares [borrowed principle], but addresses [different bottleneck/contract] through [precise change]. Under [conditions], this changes [tradeoff], which we evaluate in [locator].
 
-1. Topic sentence: define scope of this topic.
-2. Representative methods: one compact summary.
-3. Limitation tied to your target technical challenge.
-4. Transition sentence that leads to your method.
-
-## Do and Don't
-
-1. Do compare mechanisms, assumptions, and failure modes.
-2. Do emphasize the exact gap your method fills.
-3. Do not make Related Work a citation dump.
-4. Do not hide strongest baselines.
-
-## Checklist
-
-1. Are all strongest/recent competitors covered?
-2. Is each topic connected to your problem setting?
-3. Is your difference explained in technical terms, not marketing terms?
-4. Is citation coverage complete for all core claims?
+Read the cited paper before making a technical limitation claim. If its contents or relevant version are unavailable, mark the comparison as unverified. Do not invent citations or claim “first” from a small example corpus. Literature updates require current primary sources; the historical examples in [sources.md](sources.md) are writing references, not a complete baseline survey.
