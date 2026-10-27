@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "voice": "osdi-sosp-pre2023",
+  "generated": "2026-10-22",
+  "source": "03-corpus-source.md",
+  "default_register": "paper-formal",
+  "thresholds": {
+    "short_sentence_words": 8,
+    "staccato_run": 3,
+    "min_words_for_drift": 150
+  },
+  "bans": {
+    "intensifiers": [
+      "clearly",
+      "obviously",
+      "genuine",
+      "genuinely",
+      "fascinating",
+      "striking",
+      "strikingly",
+      "real and structured",
+      "certainly",
+      "undoubtedly",
+      "definitely"
+    ],
+    "hedge_connectives": [
+      "that said",
+      "to be fair",
+      "worth knowing",
+      "one thing to note",
+      "for what it's worth",
+      "with one nuance",
+      "one honest nuance",
+      "just so you are not surprised"
+    ],
+    "protest_framing": [
+      "none of this is",
+      "this is not a",
+      "it is not a gimmick",
+      "is not theoretical"
+    ],
+    "meta_commentary": [
+      "great question",
+      "i'd be happy to",
+      "i would be happy to",
+      "let me think",
+      "i want to make sure i understand",
+      "that's a really interesting",
+      "hope this helps",
+      "let me know if"
+    ],
+    "evaluative_block": [
+      "innovative",
+      "groundbreaking",
+      "revolutionary",
+      "cutting-edge",
+      "game-changing"
+    ],
+    "evaluative_review": [
+      "powerful",
+      "robust",
+      "significant",
+      "important",
+      "novel",
+      "compelling",
+      "elegant",
+      "fascinating",
+      "remarkable",
+      "exceptional",
+      "state-of-the-art"
+    ],
+    "extra_phrases": []
+  },
+  "registers": {
+    "paper-formal": {
+      "semicolons": "off",
+      "announcement_colon": "review",
+      "contractions": "forbidden",
+      "questions": "forbidden",
+      "hedge_connectives": "review",
+      "tricolon": "off",
+      "compressed_antithesis": "off",
+      "empty_intensifiers": "block",
+      "exclamations": "block",
+      "targets": {
+        "mean_sentence_words": [
+          14,
+          26
+        ],
+        "pct_short_le5_max": 0.17,
+        "pct_long_ge30": [
+          0.0,
+          0.33
+        ],
+        "comma_per_sentence": [
+          0.5,
+          1.75
+        ],
+        "hedge_per_100w_max": 1.15,
+        "boost_per_100w_max": 0.75,
+        "first_sg_per_100w_max": 1.0
+      }
+    }
+  }
+}
